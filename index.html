@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ciranda Escolar</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F1F5F1;--card:#fff;--ink:#16302B;--mut:#5C716B;--pri:#1F6F5C;--onpri:#fff;--sun:#F2B632;--line:#D9E3DD;--blue:#3C6EA5}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F1C19;--card:#1728 25;--card:#182824;--ink:#E8F1ED;--mut:#9DB3AB;--pri:#4FB89B;--onpri:#08201A;--line:#294039;--blue:#8DB4E0}}
+:root[data-theme="dark"]{--bg:#0F1C19;--card:#182824;--ink:#E8F1ED;--mut:#9DB3AB;--pri:#4FB89B;--onpri:#08201A;--line:#294039;--blue:#8DB4E0}
+*{box-sizing:border-box;margin:0}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+body{background:var(--bg);color:var(--ink);font:400 15px/1.45 Figtree,system-ui,sans-serif;height:100%;max-width:480px;margin:auto}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;line-height:1.1}
+#app{padding:16px 16px 90px}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.logo{width:38px;height:38px;border-radius:50%;border:5px solid var(--pri);border-right-color:var(--sun);border-bottom-color:var(--blue)}
+.brand h1{font-size:26px;font-weight:800}
+.sub{color:var(--mut);font-size:13px}
+input,select,textarea{width:100%;padding:12px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;margin-top:4px}
+label{font-weight:600;font-size:13px;display:block;margin-top:12px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:10px 0}
+.chip{white-space:nowrap;padding:7px 13px;border-radius:99px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:13px}
+.chip.on{background:var(--pri);color:var(--onpri);border-color:var(--pri)}
+.item{display:flex;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px;width:100%;text-align:left;color:var(--ink);font:inherit}
+.cover{width:54px;height:72px;border-radius:4px 8px 8px 4px;flex:none;display:grid;place-items:center;font:800 20px 'Bricolage Grotesque';color:#fff;border-left:5px solid rgba(0,0,0,.25)}
+.item h3{font-size:16px;font-weight:700}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;background:var(--bg);border:1px solid var(--line);margin:6px 4px 0 0}
+.tag.free{background:var(--sun);color:#3a2900;border-color:var(--sun);font-weight:600}
+.btn{width:100%;padding:14px;border:0;border-radius:12px;background:var(--pri);color:var(--onpri);font:700 16px 'Bricolage Grotesque';margin-top:16px}
+.btn.alt{background:transparent;color:var(--pri);border:1.5px solid var(--pri)}
+nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;display:flex;background:var(--card);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px))}
+nav button{flex:1;background:none;border:0;color:var(--mut);font:600 12px Figtree;padding:6px;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button span{font-size:20px}
+nav button.on{color:var(--pri)}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;z-index:9}
+.sheet>div{background:var(--card);width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:20px;max-height:85%;overflow:auto}
+.bub{max-width:80%;padding:9px 13px;border-radius:16px;margin:6px 0;background:var(--card);border:1px solid var(--line)}
+.bub.me{margin-left:auto;background:var(--pri);color:var(--onpri);border-color:var(--pri)}
+.credit{background:var(--pri);color:var(--onpri);border-radius:18px;padding:20px;margin:6px 0 14px}
+.credit b{font:800 44px 'Bricolage Grotesque';display:block}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stats div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.stats b{font:800 26px 'Bricolage Grotesque';display:block}
+.empty{text-align:center;color:var(--mut);padding:36px 10px}
+.toast{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:99px;z-index:20;font-size:14px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<nav id="nav"></nav>
+<script>
+var COLORS=['#1F6F5C','#3C6EA5','#C2573A','#7A5BA6','#B0841A'];
+var CATS=['Todos','Livros','Apostilas','Cadernos','Uniformes'];
+var SERIES=['Todas','6º ano','7º ano','8º ano','9º ano','1º EM','2º EM','3º EM'];
+var data={credits:3,given:0,got:0,
+ items:[
+  {id:1,t:'Matemática 8º ano – Vol. 2',cat:'Livros',serie:'8º ano',est:'Ótimo',tipo:'Doação',esc:'Escola Municipal Padre Cícero',dist:0.8,isbn:'9788508180000',own:'Joana (mãe de aluno)'},
+  {id:2,t:'Apostila de Redação ENEM',cat:'Apostilas',serie:'3º EM',est:'Bom',tipo:'Troca',esc:'Colégio Estadual Nordeste',dist:1.4,isbn:'',own:'Rafael S.'},
+  {id:3,t:'Uniforme camisa tam. 12',cat:'Uniformes',serie:'6º ano',est:'Ótimo',tipo:'Doação',esc:'Escola Municipal Padre Cícero',dist:0.8,isbn:'',own:'Marta L.'},
+  {id:4,t:'Caderno de Exercícios Inglês',cat:'Cadernos',serie:'9º ano',est:'Bom',tipo:'Troca',esc:'Escola Técnica Sertão',dist:3.2,isbn:'',own:'Lucas P.'},
+  {id:5,t:'Biologia 1º EM – Ed. Moderna',cat:'Livros',serie:'1º EM',est:'Regular',tipo:'Doação',esc:'Colégio Estadual Nordeste',dist:1.4,isbn:'9788516100000',own:'Ana C.'},
+  {id:6,t:'Geografia 7º ano',cat:'Livros',serie:'7º ano',est:'Ótimo',tipo:'Troca',esc:'Escola Municipal Padre Cícero',dist:0.9,isbn:'',own:'Bia M.'}
+ ],
+ chats:{}};
+var st={tab:'home',cat:'Todos',serie:'Todas',q:'',max:5};
+try{var s=localStorage.getItem('ciranda');if(s)data=JSON.parse(s)}catch(e){}
+function save(){try{localStorage.setItem('ciranda',JSON.stringify(data))}catch(e){}}
+function $(i){return document.getElementById(i)}
+function esc(x){return String(x).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function toast(m){var d=document.createElement('div');d.className='toast';d.textContent=m;document.body.appendChild(d);setTimeout(function(){d.remove()},2200)}
+function nav(){
+ var t=[['home','🔎','Explorar'],['add','➕','Publicar'],['chat','💬','Conversas'],['me','👤','Perfil']];
+ $('nav').innerHTML=t.map(function(x){return '<button class="'+(st.tab==x[0]?'on':'')+'" onclick="go(\''+x[0]+'\')"><span>'+x[1]+'</span>'+x[2]+'</button>'}).join('')}
+function go(t){st.tab=t;render()}
+function cover(it){return '<div class="cover" style="background:'+COLORS[it.id%5]+'">'+esc(it.t.charAt(0))+'</div>'}
+function card(it){return '<button class="item" onclick="detail('+it.id+')">'+cover(it)+'<div><h3>'+esc(it.t)+'</h3><div class="sub">'+esc(it.esc)+' · '+it.dist+' km</div><span class="tag '+(it.tipo=='Doação'?'free':'')+'">'+it.tipo+'</span><span class="tag">'+it.serie+'</span><span class="tag">'+it.est+'</span></div></button>'}
+function home(){
+ var l=data.items.filter(function(i){return(st.cat=='Todos'||i.cat==st.cat)&&(st.serie=='Todas'||i.serie==st.serie)&&i.dist<=st.max&&(i.t+i.esc).toLowerCase().indexOf(st.q.toLowerCase())>-1});
+ return '<div class="brand"><div class="logo"></div><div><h1>Ciranda Escolar</h1><div class="sub">Material que circula, estudo que continua</div></div></div>'+
+ '<input id="q" placeholder="Buscar livro, apostila, uniforme…" value="'+esc(st.q)+'" oninput="st.q=this.value;list()">'+
+ '<div class="chips">'+CATS.map(function(c){return '<button class="chip '+(st.cat==c?'on':'')+'" onclick="st.cat=\''+c+'\';render()">'+c+'</button>'}).join('')+'</div>'+
+ '<div style="display:flex;gap:8px"><select onchange="st.serie=this.value;list()">'+SERIES.map(function(x){return '<option '+(x==st.serie?'selected':'')+'>'+x+'</option>'}).join('')+'</select>'+
+ '<select onchange="st.max=+this.value;list()">'+[1,2,5,50].map(function(k){return '<option value="'+k+'" '+(k==st.max?'selected':'')+'>'+(k==50?'Qualquer distância':'até '+k+' km')+'</option>'}).join('')+'</select></div>'+
+ '<div id="list" style="margin-top:14px"></div>'}
+function list(){
+ var l=data.items.filter(function(i){return(st.cat=='Todos'||i.cat==st.cat)&&(st.serie=='Todas'||i.serie==st.serie)&&i.dist<=st.max&&(i.t+i.esc).toLowerCase().indexOf(st.q.toLowerCase())>-1});
+ $('list').innerHTML=l.length?l.map(card).join(''):'<div class="empty">Nenhum material encontrado.<br>Tente ampliar a distância ou publique o que você procura.</div>'}
+function detail(id){
+ var it=data.items.filter(function(i){return i.id==id})[0];
+ var d=document.createElement('div');d.className='sheet';d.onclick=function(e){if(e.target==d)d.remove()};
+ d.innerHTML='<div><h2>'+esc(it.t)+'</h2><p class="sub" style="margin:6px 0 10px">'+esc(it.esc)+' · '+it.dist+' km de você</p><span class="tag '+(it.tipo=='Doação'?'free':'')+'">'+it.tipo+'</span><span class="tag">'+it.cat+'</span><span class="tag">'+it.serie+'</span><span class="tag">Estado: '+it.est+'</span>'+(it.isbn?'<span class="tag">ISBN '+it.isbn+'</span>':'')+
+ '<p style="margin-top:14px">Anunciado por <b>'+esc(it.own)+'</b>. Combine a entrega num ponto seguro, como a própria escola.</p>'+
+ '<button class="btn" id="ask">Pedir este material</button><button class="btn alt" onclick="this.closest(\'.sheet\').remove()">Fechar</button></div>';
+ document.body.appendChild(d);
+ $('ask').onclick=function(){
+  if(!data.chats[id])data.chats[id]=[{me:1,m:'Oi! Tenho interesse em "'+it.t+'". Ainda está disponível?'}];
+  data.got++;if(it.tipo=='Doação')data.credits=Math.max(0,data.credits-1);
+  save();d.remove();toast('Pedido enviado');openChat(id)}}
+function add(){
+ return '<h2 style="font-size:26px">Publicar material</h2><p class="sub">Dê uma segunda vida ao que você não usa mais e ganhe créditos sociais.</p>'+
+ '<label>ISBN (opcional)</label><div style="display:flex;gap:8px"><input id="isbn" inputmode="numeric" placeholder="978…"><button class="chip" style="margin-top:4px" onclick="scan()">Ler código</button></div>'+
+ '<label>Título</label><input id="t" placeholder="Ex.: Matemática 8º ano">'+
+ '<label>Categoria</label><select id="cat">'+CATS.slice(1).map(function(c){return '<option>'+c+'</option>'}).join('')+'</select>'+
+ '<label>Série</label><select id="serie">'+SERIES.slice(1).map(function(c){return '<option>'+c+'</option>'}).join('')+'</select>'+
+ '<label>Estado de conservação</label><select id="est"><option>Ótimo</option><option>Bom</option><option>Regular</option></select>'+
+ '<label>Tipo</label><select id="tipo"><option>Doação</option><option>Troca</option></select>'+
+ '<label>Escola ou ponto de encontro</label><input id="esc" placeholder="Ex.: Escola Municipal Padre Cícero">'+
+ '<label>Foto do material (obrigatória)</label><input id="foto" type="file" accept="image/*" capture="environment">'+
+ '<button class="btn" onclick="pub()">Publicar</button>'}
+function scan(){var v=$('isbn').value.replace(/\D/g,'');if(v.length<10){toast('Digite 10 ou 13 números do ISBN');return}
+ $('t').value=$('t').value||'Livro ISBN '+v;toast('ISBN reconhecido')}
+function pub(){
+ var t=$('t').value.trim(),e=$('esc').value.trim();
+ if(!t||!e){toast('Preencha título e local');return}
+ if(!$('foto').files.length){toast('Anexe uma foto do material');return}
+ data.items.unshift({id:Date.now()%100000,t:t,cat:$('cat').value,serie:$('serie').value,est:$('est').value,tipo:$('tipo').value,esc:e,dist:0.1,isbn:$('isbn').value,own:'Você'});
+ data.credits+=2;data.given++;save();toast('Publicado! +2 créditos');st.tab='home';render()}
+function chats(){
+ var ids=Object.keys(data.chats);
+ return '<h2 style="font-size:26px;margin-bottom:12px">Conversas</h2>'+(ids.length?ids.map(function(id){
+  var it=data.items.filter(function(i){return i.id==id})[0]||{t:'Material',id:+id};var m=data.chats[id];
+  return '<button class="item" onclick="openChat('+id+')">'+cover(it)+'<div><h3>'+esc(it.t)+'</h3><div class="sub">'+esc(m[m.length-1].m)+'</div></div></button>'}).join(''):'<div class="empty">Você ainda não tem conversas.<br>Peça um material em Explorar para combinar a troca.</div>')}
+function openChat(id){
+ var it=data.items.filter(function(i){return i.id==id})[0]||{t:'Material'};
+ var d=document.createElement('div');d.className='sheet';d.onclick=function(e){if(e.target==d){d.remove();render()}};
+ d.innerHTML='<div><h3 style="font-size:20px">'+esc(it.t)+'</h3><div id="msgs"></div><div style="display:flex;gap:8px;margin-top:10px"><input id="msg" placeholder="Escreva uma mensagem"><button class="chip on" id="send">Enviar</button></div></div>';
+ document.body.appendChild(d);
+ function draw(){$('msgs').innerHTML=data.chats[id].map(function(x){return '<div class="bub '+(x.me?'me':'')+'">'+esc(x.m)+'</div>'}).join('')}
+ draw();
+ $('send').onclick=function(){var v=$('msg').value.trim();if(!v)return;data.chats[id].push({me:1,m:v});$('msg').value='';draw();save();
+  setTimeout(function(){data.chats[id].push({m:'Combinado! Podemos nos encontrar na escola amanhã de manhã?'});draw();save()},900)}}
+function me(){
+ return '<h2 style="font-size:26px;margin-bottom:12px">Meu perfil</h2><div class="credit"><span>Créditos sociais</span><b>'+data.credits+'</b><span style="font-size:13px">Ganhe 2 créditos ao publicar. Use 1 para pedir uma doação.</span></div>'+
+ '<div class="stats"><div><b>'+data.given+'</b><span class="sub">materiais publicados</span></div><div><b>'+data.got+'</b><span class="sub">pedidos feitos</span></div></div>'+
+ '<button class="btn alt" onclick="if(confirm(\'Apagar dados do app?\')){try{localStorage.removeItem(\'ciranda\')}catch(e){};location.reload()}">Redefinir dados de demonstração</button>'}
+function render(){
+ nav();var v={home:home,add:add,chat:chats,me:me}[st.tab]();$('app').innerHTML=v;if(st.tab=='home')list();window.scrollTo(0,0)}
+render();
+</script>
+</body>
+</html>
